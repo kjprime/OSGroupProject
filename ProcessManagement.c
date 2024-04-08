@@ -1,3 +1,14 @@
+/* ProcessManagment.c
+Group Members:
+Kevin Thomas, kevin.j.thomas@okstate.edu
+Lucas Sanger, lucas.sanger@okstate.edu
+Allison Meredith, allison.meredith@okstate.edu
+Group: C
+Autor: Lucas Sanger
+Date:4/7/2024
+
+File Discription:
+*/
 // Global data structure to hold account information.
 // All Sudo Code. Simply a representation of how the program will be laid out, but not including actual implementaion.
 AccountInfo = {}

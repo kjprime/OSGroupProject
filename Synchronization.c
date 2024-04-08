@@ -1,4 +1,15 @@
 Monitor AccountOperationsMonitor:
+/* ProcessManagment.c
+Group Members:
+Kevin Thomas, kevin.j.thomas@okstate.edu
+Lucas Sanger, lucas.sanger@okstate.edu
+Allison Meredith, allison.meredith@okstate.edu
+Group: C
+Autor: Lucas Sanger
+Date:4/7/2024
+
+File Discription:
+*/
     Lock accountLock // This lock ensures mutual exclusion.
 
     // Create a some form of Queue or waiting.
