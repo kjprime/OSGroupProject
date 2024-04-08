@@ -4,7 +4,7 @@ Kevin Thomas, kevin.j.thomas@okstate.edu
 Lucas Sanger, lucas.sanger@okstate.edu
 Allison Meredith, allison.meredith@okstate.edu
 Group: C
-Autor: Lucas Sanger
+Autor: Allison Meredith
 Date:4/7/2024
 
 File Discription: deadlock handling file (pseudocode draft)
