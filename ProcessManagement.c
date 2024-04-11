@@ -10,8 +10,6 @@ Date:4/7/2024
 File Discription:
 */
 
-
-// Global data structure to hold account information.
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -156,7 +154,3 @@ void closeAccount(char* accountID) {
         printf("Failed to close account %s\n", accountID);
     }
 }
-
-        Return
-    Delete AccountInfo[accountID]
-    Print("Account ID:", accountID, "has been closed.")
