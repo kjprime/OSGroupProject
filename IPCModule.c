@@ -1,13 +1,13 @@
 /* IPCModule.c
 Group Members:
 Kevin Thomas, kevin.j.thomas@okstate.edu
-Lucas Sanger, lucas.sanger@okstate.edu
+Lucas Sanger, lucas.sager@okstate.edu
 Allison Meredith, allison.meredith@okstate.edu
 Group: C
 Author: Allison Meredith
 Date: 4/10/2024
 
-File Discription: Inter-process Communication (IPC) Module:
+File Description: Inter-process Communication (IPC) Module:
 */
 #include <stdio.h>
 #include <stdlib.h>
