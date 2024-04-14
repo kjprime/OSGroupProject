@@ -1,7 +1,7 @@
 /* IPCModule.c
 Group Members:
 Kevin Thomas, kevin.j.thomas@okstate.edu
-Lucas Sanger, lucas.sager@okstate.edu
+Lucas Sager, lucas.sager@okstate.edu
 Allison Meredith, allison.meredith@okstate.edu
 Group: C
 Author: Allison Meredith
