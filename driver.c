@@ -1,7 +1,7 @@
 /* driver.c
 Group Members:
 Kevin Thomas, kevin.j.thomas@okstate.edu
-Lucas Sanger, lucas.sanger@okstate.edu
+Lucas Sager, lucas.sager@okstate.edu
 Allison Meredith, allison.meredith@okstate.edu
 Group: C
 Autor: Kevin Thomas
