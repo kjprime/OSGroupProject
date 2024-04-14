@@ -1,10 +1,10 @@
 /* ProcessManagment.c
 Group Members:
 Kevin Thomas, kevin.j.thomas@okstate.edu
-Lucas Sanger, lucas.sanger@okstate.edu
+Lucas Sager, lucas.sager@okstate.edu
 Allison Meredith, allison.meredith@okstate.edu
 Group: C
-Autor: Lucas Sanger
+Autor: Lucas Sager
 Date:4/7/2024
 
 File Discription:
@@ -43,23 +43,48 @@ int main() {
         {"A342131", "Inquiry", 0, ""},
         {"A382131", "Inquiry", 0, ""},
         {"A342131", "Close", 0, ""}
-    };
-    int n = sizeof(transactions) / sizeof(Transaction);
+    };    
+char currentAccountID[10];
+int n = sizeof(transactions) / sizeof(Transaction);
+char processedAccountIDs[100][10]; // Assuming a maximum of 100 unique account IDs
+int numProcessed = 0;
+pid_t pid = 1;
 
-    for (int i = 0; i < n; ++i) {
-        pid_t pid = fork();
+for (int i = 0; i < n; ++i) {
+    if (pid != 0) {
+        int isNewAccount = 1;
+        for (int j = 0; j < numProcessed; j++) {
+            if (strcmp(processedAccountIDs[j], transactions[i].accountID) == 0) {
+                isNewAccount = 0;
+                break;
+            }
+        }
+        if (isNewAccount) {
+            strcpy(processedAccountIDs[numProcessed], transactions[i].accountID);
+            strcpy(currentAccountID, transactions[i].accountID);
+            numProcessed++;
 
-        if (pid == 0) { // Child process
-            processTransaction(transactions[i]);
-            exit(0); // Exit child process
-        } else if (pid > 0) {
-            // Parent process waits for child to complete
-            wait(NULL);
-        } else {
-            printf("Fork failed\n");
-            exit(1);
+            pid = fork();
+            if (pid == -1) {
+                printf("Error forking\n");
+                exit(1);
+            } else if (pid == 0) {
+                // Child process
+                printf("Child process %d created for account %s\n", getpid(), transactions[i].accountID);
+            }
         }
     }
+        if (pid == 0) { // Child process
+            if (strcmp(transactions[i].accountID, currentAccountID) == 0)
+            {
+                //printf("I'm %d, and %s I'm processing trasaction %d,id: %s\n",getpid(),currentAccountID,i,transactions[i].accountID); // debug print statment
+                processTransaction(transactions[i]);
+            }
+            //else printf("found id of %s, and I'm account id %s\n",transactions[i].accountID,currentAccountID);    //debug print statment
+        }
+    
+    }
+    wait(NULL);
 
     return 0;
 }
