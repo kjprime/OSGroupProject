@@ -17,12 +17,7 @@ File Discription: Inter-process Communication (IPC) Module:
 
 
 //Function to write data into shared memory
-void writeToSharedMemory(
-   char accountID[10];
-    char transactionType[10];
-    int amount;
-    char targetAccountID[10];
-) {
+void writeToSharedMemory(char*accountID, char *transactionType, int amount, char *targetAccountID) {
     key_t key = ftok("shmfile", 65); //Generate key
     int shmid = shmget(key, 1024, 0666 | IPC_CREAT); //Create shared memory segment
 
@@ -34,7 +29,7 @@ void writeToSharedMemory(
     char* str = (char*)shmat(shmid, NULL, 0); //Attach process to shared memory
 
     //printf("Write Data: ");
-    fgets(str, 1024, accountID, transactionType, amount, targetAccountID); //read input 
+    //fgets(str, 1024, accountID, transactionType, amount, targetAccountID); //read input 
 
    //printf("Data written in memory: %s", str);
 
