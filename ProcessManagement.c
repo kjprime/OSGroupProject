@@ -15,13 +15,9 @@ File Discription:
 #include <unistd.h>
 #include <sys/wait.h>
 #include <string.h>
+#include "Transaction.h"
 
-typedef struct {
-    char accountID[10];
-    char transactionType[10];
-    int amount;
-    char targetAccountID[10]; // For transfer operations
-} Transaction;
+
 
 // Transaction function prototypes
 void processTransaction(Transaction transaction);
@@ -32,8 +28,8 @@ void transfer(char* accountID, char* targetAccountID, int amount);
 void inquiry(char* accountID);
 void closeAccount(char* accountID);
 
-int main() {
-    Transaction transactions[] = {
+int ProcessManagment(Transaction transactions[], int n) {
+   /* Transaction transactions[] = {
         {"A332131", "Withdraw", 40, ""},
         {"A342131", "Create", 40, ""},
         {"A342131", "Inquiry", 0, ""},
@@ -43,9 +39,8 @@ int main() {
         {"A342131", "Inquiry", 0, ""},
         {"A382131", "Inquiry", 0, ""},
         {"A342131", "Close", 0, ""}
-    };    
+    }; */   
 char currentAccountID[10];
-int n = sizeof(transactions) / sizeof(Transaction);
 char processedAccountIDs[100][10]; // Assuming a maximum of 100 unique account IDs
 int numProcessed = 0;
 pid_t pid = 1;

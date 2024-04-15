@@ -13,12 +13,14 @@ File Discription: Main function driver file for OS project
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ProcessManagment.c>
-#include <Syncronization.c>
+#include "readfile.c"
+//#include <ProcessManagment.c>
+//#include <Syncronization.c>
 
 int main() {
     char input_txt[] = "input.txt"; //input file name
 
+    readfile();
     //loop for input file content avalablity
 
     // Process input text for data related to account functions
