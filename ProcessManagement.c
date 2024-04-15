@@ -79,7 +79,14 @@ for (int i = 0; i < n; ++i) {
         }
     
     }
-    wait(NULL);
+
+    if(pid!=0)
+    {
+            //printf("begening wait for returns from childs\n");    //debug stuff
+        for(int i = 0; i < n; ++i) wait(NULL);
+            //printf("done waiting for children\n");        //debug stuff
+    }
+    //else printf("child process ending %d\n",getpid());      //debug stuff
 
     return 0;
 }
