@@ -44,10 +44,10 @@ void readfile() {
             line[len - 1] = '\0';
         }
 
-        char accountNum[MAX_LINE_LENGTH];
-        char taskType[MAX_LINE_LENGTH];
-        int value ;  // Default value for value
-        char destAccountNum [MAX_LINE_LENGTH];  // Default value for destination account number
+        char accountNum[MAX_LINE_LENGTH]="\0";
+        char taskType[MAX_LINE_LENGTH]="\0";
+        int value =0;  // Default value for value
+        char destAccountNum [MAX_LINE_LENGTH]="\0";  // Default value for destination account number
 
         // Tokenize the line based on spaces
         char *token = strtok(line, " ");
@@ -68,6 +68,7 @@ void readfile() {
                     if (token != NULL) {
                         strcpy(destAccountNum,token);  
                     }
+                    
                 }
 
 

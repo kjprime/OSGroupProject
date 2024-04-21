@@ -12,11 +12,26 @@ File Discription: struct def for trsaction sepperation
 #ifndef TRANSACTION_H
 #define TRANSACTION_H
 
-typedef struct {
+typedef struct {    // using 
     char accountID[10];
-    char transactionType[10];
+    char transactionType[10][17];
+    int amount[10];
+    char targetAccountID[10][10]; 
+    char status[10][10];
+    int history_length;
+} History;
+
+typedef struct {
+    int index;
+    int account;
+    char accountID[10];
+    char transactionType[17];
     int amount;
     char targetAccountID[10]; // For transfer operations
+    char status[10];    //status, pending, processing, processed, error (declined)
+    int history_length;
+    History history;
 } Transaction;
+
 
 #endif
