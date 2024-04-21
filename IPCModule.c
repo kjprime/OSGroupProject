@@ -19,8 +19,8 @@ File Description: Inter-process Communication (IPC) Module:
 #include <sys/wait.h>
 #include "Transaction.h"
 
-#include "que.h"
-#include "que.c"
+#include "Synchronization.h"
+#include "Synchronization.c"
 
 #define SHARED_MEMORY_SIZE 100
 #define SHM_NAME "/data1_shared_memory"

@@ -1,10 +1,10 @@
-/* ProcessManagment.c
+/* ProcessManagement.c
 Group Members:
 Kevin Thomas, kevin.j.thomas@okstate.edu
 Lucas Sager, lucas.sager@okstate.edu
 Allison Meredith, allison.meredith@okstate.edu
 Group: C
-Autor: Lucas Sager
+Author: Lucas Sager
 Date:4/7/2024
 
 File Discription:
@@ -98,7 +98,7 @@ for (int i = 0; i < n; ++i) {
     return 0;
 }
 void transaction_tostring(Transaction transaction){
-    printf("Account:%s Ballance:%d \n",transaction.accountID,transaction.amount);
+    printf("Account:%s Ballance:%10d Transaction preformed:%s, %s\n",transaction.accountID,transaction.amount,transaction.transactionType,transaction.status);
 }
 void history_tostring(char processedAccountIDs[][10],int n){ //processed account id's and number of accoutns processed
     //look up all of the trasactions, print out history, and print out transaction to string
@@ -122,6 +122,20 @@ void history_tostring(char processedAccountIDs[][10],int n){ //processed account
         temp.index = get_acc_numb(temp.accountID)% 71;
         temp = readquiet(temp);  //change this to dedicated
         transaction_tostring(temp);
+    }
+}
+void writefiles(Transaction transaction){
+    char filename[20];
+    sprintf(filename, "%s.txt", transaction.accountID);
+    FILE* file = fopen(filename, "r+");
+    if (file) {
+        int currentBalance;
+        fscanf(file, "%d", &currentBalance);
+        fseek(file, 0, SEEK_SET);
+        fprintf(file, "%d", currentBalance + transaction.amount);
+        fclose(file);
+    } else {
+        printf("Account %s not found for final\n", transaction.accountID);
     }
 }
 
@@ -167,22 +181,26 @@ History history(Transaction transaction){
 }
 
 void createAccount(Transaction transaction) {
-    transaction.history_length=0;
+    Transaction temp = readProcess(transaction);
+    transaction.history_length=temp.history_length;
+    transaction.history = temp.history;
+    if(temp.account != transaction.account) 
+    {
     strcpy(transaction.status,"Success");
     transaction.history = history(transaction);
     transaction.history_length = transaction.history.history_length;
     writeProcess(transaction); //this is fixed.
+    }
+    else    //there already exist a account
+    {
+        strcpy(transaction.status,"Failure");
+        temp.index = transaction.index; // for if there is no index in the memory already.
+        temp.history = history(transaction);
+        temp.history_length = temp.history.history_length;
+        writeProcess(temp); //writing only the history 
+    }
     //printf("withdraw things stuff %d       debgy history, length %d:%s, %s, %d, %s, %s\n",transaction.history_length-1,transaction.history.history_length,transaction.history.accountID,transaction.history.transactionType[transaction.history_length-1],transaction.history.amount[transaction.history_length-1],transaction.history.targetAccountID[transaction.history_length-1],transaction.history.status[transaction.history_length-1]);
     transaction_tostring(transaction);
-    char filename[20];
-    sprintf(filename, "%s.txt", transaction.accountID);
-    FILE* file = fopen(filename, "w");
-    if (file) {
-        fprintf(file, "%d", transaction.amount);
-        fclose(file);
-    } else {
-        printf("Failed to create account for %s\n", transaction.accountID);
-    }
 }
 
 void deposit(Transaction transaction) {//char* accountID, int amount
@@ -208,18 +226,7 @@ void deposit(Transaction transaction) {//char* accountID, int amount
     }
     //printf("withdraw things stuff        debgy history, length %d:%s, %s, %d, %s, %s\n",temp.history.history_length,temp.history.accountID,temp.history.transactionType[temp.history_length-1],temp.history.amount[temp.history_length-1],temp.history.targetAccountID[temp.history_length-1],temp.history.status[temp.history_length-1]);
     transaction_tostring(temp);
-    char filename[20];
-    sprintf(filename, "%s.txt", transaction.accountID);
-    FILE* file = fopen(filename, "r+");
-    if (file) {
-        int currentBalance;
-        fscanf(file, "%d", &currentBalance);
-        fseek(file, 0, SEEK_SET);
-        fprintf(file, "%d", currentBalance + transaction.amount);
-        fclose(file);
-    } else {
-        printf("Account %s not found for deposit\n", transaction.accountID);
-    }
+    
 }
 
 void withdraw(Transaction transaction) {//char* accountID, int amount
@@ -246,22 +253,7 @@ void withdraw(Transaction transaction) {//char* accountID, int amount
     }
     //printf("withdraw things stuff        debgy history, length %d:%s, %s, %d, %s, %s\n",temp.history.history_length,temp.history.accountID,temp.history.transactionType[temp.history_length-1],temp.history.amount[temp.history_length-1],temp.history.targetAccountID[temp.history_length-1],temp.history.status[temp.history_length-1]);
     transaction_tostring(temp);
-    char filename[20];
-    sprintf(filename, "%s.txt", transaction.accountID);
-    FILE* file = fopen(filename, "r+");
-    if (file) {
-        int currentBalance;
-        fscanf(file, "%d", &currentBalance);
-        if (currentBalance >= transaction.amount) {
-            fseek(file, 0, SEEK_SET);
-            fprintf(file, "%d", currentBalance - transaction.amount);
-        } else {
-            printf("Insufficient funds in account %s\n", transaction.accountID);
-        }
-        fclose(file);
-    } else {
-        printf("Account %s not found for withdrawal\n", transaction.accountID);
-    }
+    
 }
 
 void transfer(Transaction transaction) {//char* accountID, char* targetAccountID, int amount
@@ -302,17 +294,7 @@ void inquiry(Transaction transaction) {//char* accountID
     //printf("withdraw things stuff        debgy history, length %d:%s, %s, %d, %s, %s\n",temp.history.history_length,temp.history.accountID,temp.history.transactionType[temp.history_length-1],temp.history.amount[temp.history_length-1],temp.history.targetAccountID[temp.history_length-1],temp.history.status[temp.history_length-1]);
     transaction_tostring(temp);
     //we read the shared memory!
-    char filename[20];
-    sprintf(filename, "%s.txt", transaction.accountID);
-    FILE* file = fopen(filename, "r");
-    if (file) {
-        int balance;
-        fscanf(file, "%d", &balance);
-        printf("Account %s has balance: $%d\n", transaction.accountID, balance);
-        fclose(file);
-    } else {
-        printf("Account %s not found for inquiry\n", transaction.accountID);
-    }
+    
 }
 
 void closeAccount(Transaction transaction) {//char* accountID
@@ -348,11 +330,7 @@ void closeAccount(Transaction transaction) {//char* accountID
     transaction_tostring(temp);
     //modify me. add a closed account thing...
     writeProcess(temp); //
-    char filename[20];
-    sprintf(filename, "%s.txt", transaction.accountID);
-    if (remove(filename) != 0) {
-        printf("Failed to close account %s\n", transaction.accountID);
-    }
+   
 }
 
 int get_acc_numb(char *str) {   //converts account number like A123 to int 123 for index

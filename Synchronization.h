@@ -1,3 +1,14 @@
+/* Synchronization.h
+Group Members:
+Kevin Thomas, kevin.j.thomas@okstate.edu
+Lucas Sager, lucas.sager@okstate.edu
+Allison Meredith, allison.meredith@okstate.edu
+Group: C
+Author: Kevin Thomas
+Date:4/7/2024
+
+File Discription:
+*/
 //que.h
 #ifndef QUE_HEAD_H
 #define QUE_HEAD_H
