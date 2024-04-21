@@ -59,6 +59,7 @@ Transaction readProcess(Transaction transaction) {
     //printf("Enqueued process %d\n", getpid());
     while(peek() != getpid());
     sem_wait(semaphore);
+    printf("reading memory for read functions\n");
     int value = sharedMemory[transaction.index].amount;
     //printf("Read value %d from index %d\n", value, transaction.index);
     //sem_post(semaphore);  //don't deque and don't free the semephore need to write to close
@@ -153,6 +154,7 @@ void transferrelease(Transaction transaction, Transaction transaction2) {//store
     //Transaction temp = sharedMemory[transaction.index];   //not needed just for print
     sharedMemory[transaction.index] = transaction;
     sharedMemory[transaction2.index] = transaction2;
+    printf("wrote t2 to index %i\n",transaction2.index);
     //printf("Wrote value %d at index %d, prior value was %d\n", transaction.amount, transaction.index, temp.amount);
     sem_post(semaphore);
     dequeue(queue);
