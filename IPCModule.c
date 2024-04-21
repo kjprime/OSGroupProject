@@ -36,11 +36,12 @@ void writeProcess(Transaction transaction) {//value needs to be a struct detaili
     QueueElement element;
     element.data = transaction.index;  //trasaction number?
     element.pid = getpid();
-    enqueue(element);
+    element.account = transaction.account;
+    //enqueue(element);     //not needed trasaction always comes from read first with the approprate blocking
   //printf("I've made it here 0 in pid:%d\n",getpid());
     //printf("Enqueued process %d\n",element.pid);
-    while(peek() != getpid());
-    sem_wait(semaphore);
+   // while(peek() != getpid());
+   // sem_wait(semaphore);
     Transaction temp = sharedMemory[transaction.index];
     sharedMemory[transaction.index] = transaction;
     //printf("Wrote value %d at index %d, prior value was %d\n", transaction.amount, transaction.index, temp.amount);
@@ -53,14 +54,15 @@ Transaction readProcess(Transaction transaction) {
     QueueElement element;
     element.data = transaction.index;
     element.pid = getpid();
+    element.account = transaction.account;
     enqueue(element);
     //printf("Enqueued process %d\n", getpid());
     while(peek() != getpid());
     sem_wait(semaphore);
     int value = sharedMemory[transaction.index].amount;
     //printf("Read value %d from index %d\n", value, transaction.index);
-    sem_post(semaphore);
-    dequeue(queue);
+    //sem_post(semaphore);  //don't deque and don't free the semephore need to write to close
+    //dequeue(queue);
     //printf("Dequeued reading process %d\n", getpid());
     return sharedMemory[transaction.index];
 }
@@ -68,6 +70,7 @@ Transaction readquiet(Transaction transaction) {    // for printing out nicely t
     QueueElement element;
     element.data = transaction.index;
     element.pid = getpid();
+    element.account = transaction.account;
     enqueue_quiet(element);
     //printf("Enqueued process %d\n", getpid());
     while(peek() != getpid());
@@ -78,6 +81,82 @@ Transaction readquiet(Transaction transaction) {    // for printing out nicely t
     dequeue(queue);
     //printf("Dequeued reading process %d\n", getpid());
     return sharedMemory[transaction.index];
+}
+Transaction readforce(Transaction transaction) {    // for forcing reading where your que is resticted elsewhere
+    //QueueElement element;
+    //element.data = transaction.index;
+    //element.pid = getpid();
+    //element.account = transaction.account;
+    //enqueue_quiet(element);
+    //printf("Enqueued process %d\n", getpid());
+    //while(peek() != getpid());
+    //sem_wait(semaphore);
+    //int value = sharedMemory[transaction.index].amount;
+    //printf("Read value %d from index %d\n", value, transaction.index);
+    //sem_post(semaphore);
+    //dequeue(queue);
+    //printf("Dequeued reading process %d\n", getpid());
+    return sharedMemory[transaction.index];
+}
+int search_queue(int account) {
+    sem_wait(mutex);
+
+    if (queue->front == -1) {
+        printf("Queue is empty\n");
+        sem_post(mutex);
+        return 0;
+    }
+
+    int i = queue->front;
+    do {
+        if (queue->elements[i].data == account) {
+            sem_post(mutex);
+            return 1; // Match found
+        }
+        i = (i + 1) % queue->size;
+    } while (i != (queue->rear + 1) % queue->size);
+
+    sem_post(mutex);
+    return 0; // No match found
+}
+
+
+Transaction transferCheckin(Transaction transaction) {
+        printf("doing trasfer checkin\n");
+    QueueElement element;
+    element.data = transaction.index;
+    element.pid = getpid();
+    element.account = transaction.account;
+    enqueue(element);
+    //printf("Enqueued process %d\n", getpid());
+    while(peek() != getpid());
+    printf("doing trasfer checkin past peek\n");
+    sem_wait(semaphore);
+    printf("doing trasfer checkin past sema\n");
+    int value = sharedMemory[transaction.index].amount;
+    //printf("Read value %d from index %d\n", value, transaction.index);
+    //sem_post(semaphore);  //dont release this is done in the compaion trasfer release
+    //dequeue(queue);
+    //printf("Dequeued reading process %d\n", getpid());
+    return sharedMemory[transaction.index];
+}
+void transferrelease(Transaction transaction, Transaction transaction2) {//stores both of the values for the trasfer
+    //QueueElement element;
+    //element.data = transaction.index;  //trasaction number?
+    //element.pid = getpid();
+    //element.account = transaction.account;
+    //enqueue(element);
+  //printf("I've made it here 0 in pid:%d\n",getpid());
+    //printf("Enqueued process %d\n",element.pid);
+    //while(peek() != getpid());    // could be maintained
+    //sem_wait(semaphore);      //expedted we already have the semaphre
+    //Transaction temp = sharedMemory[transaction.index];   //not needed just for print
+    sharedMemory[transaction.index] = transaction;
+    sharedMemory[transaction2.index] = transaction2;
+    //printf("Wrote value %d at index %d, prior value was %d\n", transaction.amount, transaction.index, temp.amount);
+    sem_post(semaphore);
+    dequeue(queue);
+    //printf("Dequeued writing process %d\n", getpid());
 }
 
 

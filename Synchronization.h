@@ -29,6 +29,7 @@ File Discription:
 typedef struct {
     int data;
     pid_t pid;
+    int account;
 } QueueElement;
 
 // Structure for the shared queue
