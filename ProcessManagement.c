@@ -16,6 +16,7 @@ File Discription:
 #include <sys/wait.h>
 #include <string.h>
 #include "Transaction.h"
+#include <time.h>
 
 #include "IPCModule.c"
 
@@ -99,7 +100,7 @@ for (int i = 0; i < n; ++i) {
     return 0;
 }
 void transaction_tostring(Transaction transaction){
-    printf("Account:%s Ballance:%10d Transaction preformed:%s, %s, by %d\n",transaction.accountID,transaction.amount,transaction.transactionType,transaction.status,getpid());
+    printf("Account:%s Ballance:%10d Transaction preformed:%s, %s, by %d | %s",transaction.accountID,transaction.amount,transaction.transactionType,transaction.status,getpid(),asctime(localtime(&transaction.history.time[transaction.history_length-1])));
 }
 void final_transaction_tostring(Transaction transaction){
     char status[10];
@@ -123,7 +124,9 @@ void history_tostring(char processedAccountIDs[][10],int n){ //processed account
         temp = readquiet(temp);  //change this to dedicated
         printf("------------------------ Account: %10s ------------------------\n",temp.accountID);
         for(int ii=0;ii<temp.history_length;ii++){ //the history in the memory
-            printf("%d history length %d history print:%s,%15s,%3d, %7s, %s\n",ii,temp.history_length,temp.history.accountID,temp.history.transactionType[ii],temp.history.amount[ii],temp.history.targetAccountID[ii],temp.history.status[ii]);
+            printf("history %d of %d Account:%s,%15s,%3d, %7s, %s | %s",ii,temp.history_length,temp.history.accountID,temp.history.transactionType[ii],temp.history.amount[ii],temp.history.targetAccountID[ii],temp.history.status[ii],asctime(localtime(&temp.history.time[ii])));
+            //printf("```````````````````d````````````-------d--------`-`-`-`-`-`-`- time %s\n",asctime(temp.history.time[temp.history.history_length-1]));
+            //  printf("tidmer timer timer %s",asctime(temp.history.time[temp.history.history_length-1]));
         }
     }
         printf("-----------------Final Ballances--------------------\n");
@@ -172,6 +175,10 @@ void processTransaction(Transaction transaction) {
 }
 
 History history(Transaction transaction){
+    time_t current_time;
+    struct tm *local_time;
+    current_time = time(NULL);
+    local_time = localtime(&current_time);
     //printf("running the history fucntion for %s\n",transaction.transactionType);
     History newhist;
     newhist = transaction.history;
@@ -179,13 +186,17 @@ History history(Transaction transaction){
     //  {
     //  printf("--orig hist---history at index %d,# %s,%s,%d,%s,%s\n",i,newhist.accountID,newhist.transactionType[i],newhist.amount[i],newhist.targetAccountID[i],newhist.status[i]);
     //  }
+    //printf("````````````````````11````1``````--1-------------`-`-`-`-`-`-`- time %s\n",asctime(local_time));
     strcpy(newhist.accountID, transaction.accountID);
     strcpy(newhist.transactionType[transaction.history_length],transaction.transactionType);
     //printf("HISSSSSSSSSSSSSSSSSSSSSSSSSSSSTRY :trans type:%s\n",newhist.transactionType[transaction.history_length]);
     newhist.amount[transaction.history_length] = transaction.amount;
     strcpy(newhist.targetAccountID[transaction.history_length],transaction.targetAccountID);
     strcpy(newhist.status[transaction.history_length],transaction.status);
+    newhist.time[newhist.history_length] = current_time;
+    //printf("timer timer timer %s",asctime(localtime(&newhist.time[newhist.history_length])));
     newhist.history_length= transaction.history_length+1;
+    
     //printf("history length returned %d,history length in %d\n",newhist.history_length,transaction.history_length);
     // for(int i=0;i<newhist.history_length;i++)
     // {
@@ -236,6 +247,7 @@ void deposit(Transaction transaction) {//char* accountID, int amount
         temp.history = history(transaction);
         temp.amount = temp.amount + transaction.amount;
         temp.history_length = temp.history.history_length;
+       // printf("timer timer timer %s",asctime(localtime(&temp.history.time[temp.history.history_length-1])));
         writeProcess(temp); 
     }
     else    //log failre

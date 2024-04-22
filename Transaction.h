@@ -12,6 +12,7 @@ File Discription: struct def for trsaction sepperation
 #ifndef TRANSACTION_H
 #define TRANSACTION_H
 
+
 typedef struct {    // using 
     char accountID[10];
     char transactionType[10][17];
@@ -19,6 +20,7 @@ typedef struct {    // using
     char targetAccountID[10][10]; 
     char status[10][10];
     int history_length;
+    time_t time[10];
 } History;
 
 typedef struct {
