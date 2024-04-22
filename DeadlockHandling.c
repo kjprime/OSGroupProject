@@ -11,11 +11,16 @@ File Description: deadlock handling file
 --implement a deadlock prevention mechanism by eliminating circular wait
 */
 
-#include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <string.h>
+#include <semaphore.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include "Synchronization.h"
+
 
 #define MAX_COUNT 3
 #define SLEEP_TIMER 10
@@ -25,12 +30,26 @@ int shmid;
 SharedQueue *queue;
 sem_t *mutex, *full, *empty;
 
+
+// Function to access shm
+int check_queue(pid_t pid) {
+    if(pid == -1){
+        //if able to access element successfully
+        return -1;
+    }
+    else{
+        //unable to access resource
+        return 0;
+        }
+}
+
 // Function to acquire element with timeout
 int timeout_handler() {
     int count = 0;
     while (1) {
+
         //element acquired sucessfully 
-        if (check_queue((-1))) {
+        if(check_queue(-1)==-1){
             return 1; 
         }
 
@@ -44,20 +63,9 @@ int timeout_handler() {
         printf("Retrying after %d seconds...\n", SLEEP_TIMER);
         sleep(SLEEP_TIMER);
         count++;
+        return 0; 
     }
 }
 
-//PLACEHOLDER CODE -- will fix
-// Function to access shm
-int check_queue(pid_t pid, SharedQueue *queue) {
-    if(pid == -1){
-        //if able to access element successfully
-        return -1;
-    }
-    else{
-        //unable to access resource
-        return 0;
-        }
-}
 
 
