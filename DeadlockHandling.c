@@ -1,49 +1,63 @@
-/* ProcessManagment.c
+/* DeadlockHandling.c
 Group Members:
 Kevin Thomas, kevin.j.thomas@okstate.edu
 Lucas Sager, lucas.sager@okstate.edu
 Allison Meredith, allison.meredith@okstate.edu
 Group: C
-Autor: Allison Meredith
-Date:4/7/2024
+Author: 
+Date:4/10/2024
 
-File Discription: deadlock handling file (pseudocode draft)
---implment a deadlock prevention mechanism by eliminating circular wait
+File Description: deadlock handling file 
+--implement a deadlock prevention mechanism by eliminating circular wait
 */
 
-// Define the processes and their requested resources
-n = 6; //6 total processes
-r = 4; 
-int alloc[4][6] = {
-    
-    {"Create", "R1", "R2", "R3"},
-    {"Deposit", "R1", "R2", "R3"},
-    {"Withdraw", "R1", "R2", "R3"},
-    {"Inquiry", "R1", "R2", "R3"},
-    {"Transfer", "R2", "R3", "R1"},
-    {"Close", "R1", "R2", "R3"}
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <string.h>
 
-};
-//create max matrix
- int max[4][6] =      { }, //Create
-                      { }, //Deposit
-                      { }, //Withdraw
-                      { }, //Inquiry 
-                      { },  //Transsfer
-                      { } }; //Close
+#define MAX_COUNT 3
+#define SLEEP_TIMER 10
 
-//available resource matrix
- int available[3] = { 3, 3, 2 };
+// Global variables for shared memory and semaphore
+int shmid;
+SharedQueue *queue;
+sem_t *mutex, *full, *empty;
 
-//calculate need matrix
- int need[n][m];
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < m; j++)
-            need[i][j] = max[i][j] - alloc[i][j];
+// Function to acquire element with timeout
+int timeout_handler() {
+    int count = 0;
+    while (1) {
+        //element acquired sucessfully 
+        if (check_queue((-1))) {
+            return 1; 
+        }
+
+        //maximum retries reached...process failed
+        if (count >= MAX_COUNT) {
+            printf("Process failed...\n");
+            return 0;
+        }
+
+        //retry after sleep
+        printf("Retrying after %d seconds...\n", SLEEP_TIMER);
+        sleep(SLEEP_TIMER);
+        count++;
     }
-//use banker's algorithm to check if system is safe
-
-//check for circular wait
-if (circular wait detected){
-    return false;
 }
+
+//PLACEHOLDER CODE -- will fix
+// Function to access shm
+int check_queue(pid_t pid, SharedQueue *queue) {
+    if(pid == -1){
+        //if able to access element successfully
+        return -1;
+    }
+    else{
+        //unable to access resource
+        return 0;
+        }
+}
+
+
