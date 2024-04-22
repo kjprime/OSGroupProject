@@ -113,7 +113,7 @@ QueueElement dequeue() {
     
     sem_post(mutex);
     sem_post(empty);
-    printf("dequeued acccount index:%d, pid:%d account:%d ;\n", element.data,element.pid,element.account);
+    //printf("dequeued acccount index:%d, pid:%d account:%d ;\n", element.data,element.pid,element.account);
     return element;
 }
 

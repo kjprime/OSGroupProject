@@ -59,7 +59,7 @@ Transaction readProcess(Transaction transaction) {
     //printf("Enqueued process %d\n", getpid());
     while(peek() != getpid());
     sem_wait(semaphore);
-    printf("reading memory for read functions\n");
+    //printf("reading memory for read functions\n");    //debug
     int value = sharedMemory[transaction.index].amount;
     //printf("Read value %d from index %d\n", value, transaction.index);
     //sem_post(semaphore);  //don't deque and don't free the semephore need to write to close
@@ -103,7 +103,7 @@ int search_queue(int account) {
     sem_wait(mutex);
 
     if (queue->front == -1) {
-        printf("Queue is empty\n");
+        //printf("Queue is empty\n");   //debug
         sem_post(mutex);
         return 0;
     }
@@ -123,7 +123,7 @@ int search_queue(int account) {
 
 
 Transaction transferCheckin(Transaction transaction) {
-        printf("doing trasfer checkin\n");
+       // printf("doing trasfer checkin\n");    //debug
     QueueElement element;
     element.data = transaction.index;
     element.pid = getpid();
@@ -131,9 +131,9 @@ Transaction transferCheckin(Transaction transaction) {
     enqueue(element);
     //printf("Enqueued process %d\n", getpid());
     while(peek() != getpid());
-    printf("doing trasfer checkin past peek\n");
+    //printf("doing trasfer checkin past peek\n");
     sem_wait(semaphore);
-    printf("doing trasfer checkin past sema\n");
+    //printf("doing trasfer checkin past sema\n"); // debug
     int value = sharedMemory[transaction.index].amount;
     //printf("Read value %d from index %d\n", value, transaction.index);
     //sem_post(semaphore);  //dont release this is done in the compaion trasfer release
@@ -154,7 +154,7 @@ void transferrelease(Transaction transaction, Transaction transaction2) {//store
     //Transaction temp = sharedMemory[transaction.index];   //not needed just for print
     sharedMemory[transaction.index] = transaction;
     sharedMemory[transaction2.index] = transaction2;
-    printf("wrote t2 to index %i\n",transaction2.index);
+    //printf("wrote t2 to index %i\n",transaction2.index);  //debug
     //printf("Wrote value %d at index %d, prior value was %d\n", transaction.amount, transaction.index, temp.amount);
     sem_post(semaphore);
     dequeue(queue);

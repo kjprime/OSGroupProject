@@ -33,6 +33,7 @@ void closeAccount(Transaction transaction);
 int get_acc_numb(char *str);
 void history_tostring(char processedAccountIDs[][10],int n);
 void transaction_tostring(Transaction transaction);
+void writefiles(Transaction transaction);
 
 int ProcessManagment(Transaction transactions[], int n) {
    /* Transaction transactions[] = {
@@ -100,6 +101,17 @@ for (int i = 0; i < n; ++i) {
 void transaction_tostring(Transaction transaction){
     printf("Account:%s Ballance:%10d Transaction preformed:%s, %s, by %d\n",transaction.accountID,transaction.amount,transaction.transactionType,transaction.status,getpid());
 }
+void final_transaction_tostring(Transaction transaction){
+    char status[10];
+    if(!strcmp(transaction.accountID,"\0"))
+    {
+        strcpy(status, "Closed");
+    }
+    else strcpy(status, "Active");
+
+    //printf("%s\n",transaction.status); //debug
+    printf("Account:%10s Ballance:%10d Account Status:%s\n",transaction.accountID,transaction.amount,status);
+}
 void history_tostring(char processedAccountIDs[][10],int n){ //processed account id's and number of accoutns processed
     //look up all of the trasactions, print out history, and print out transaction to string
     printf("\nTracked accounts and history:\n");
@@ -111,7 +123,7 @@ void history_tostring(char processedAccountIDs[][10],int n){ //processed account
         temp = readquiet(temp);  //change this to dedicated
         printf("------------------------ Account: %10s ------------------------\n",temp.accountID);
         for(int ii=0;ii<temp.history_length;ii++){ //the history in the memory
-            printf("%d history length %d history print:%s, %s, %d, %s, %s\n",ii,temp.history_length,temp.history.accountID,temp.history.transactionType[ii],temp.history.amount[ii],temp.history.targetAccountID[ii],temp.history.status[ii]);
+            printf("%d history length %d history print:%s,%15s,%3d, %7s, %s\n",ii,temp.history_length,temp.history.accountID,temp.history.transactionType[ii],temp.history.amount[ii],temp.history.targetAccountID[ii],temp.history.status[ii]);
         }
     }
         printf("-----------------Final Ballances--------------------\n");
@@ -121,21 +133,22 @@ void history_tostring(char processedAccountIDs[][10],int n){ //processed account
         strcpy(temp.accountID,processedAccountIDs[i]);    //set the index number for use in memory
         temp.index = get_acc_numb(temp.accountID)% 71;
         temp = readquiet(temp);  //change this to dedicated
-        transaction_tostring(temp);
+        final_transaction_tostring(temp);
+        writefiles(temp);
     }
 }
 void writefiles(Transaction transaction){
     char filename[20];
     sprintf(filename, "%s.txt", transaction.accountID);
-    FILE* file = fopen(filename, "r+");
+    if(strcmp(transaction.accountID,"\0")){
+    FILE* file = fopen(filename, "w");
     if (file) {
-        int currentBalance;
-        fscanf(file, "%d", &currentBalance);
         fseek(file, 0, SEEK_SET);
-        fprintf(file, "%d", currentBalance + transaction.amount);
+        fprintf(file, "%d", transaction.amount);
         fclose(file);
     } else {
         printf("Account %s not found for final\n", transaction.accountID);
+    }
     }
 }
 
@@ -159,13 +172,13 @@ void processTransaction(Transaction transaction) {
 }
 
 History history(Transaction transaction){
-    printf("running the history fucntion for %s\n",transaction.transactionType);
+    //printf("running the history fucntion for %s\n",transaction.transactionType);
     History newhist;
     newhist = transaction.history;
-     for(int i=0;i<transaction.history_length;i++)
-     {
-     printf("--orig hist---history at index %d,# %s,%s,%d,%s,%s\n",i,newhist.accountID,newhist.transactionType[i],newhist.amount[i],newhist.targetAccountID[i],newhist.status[i]);
-     }
+    //  for(int i=0;i<transaction.history_length;i++)
+    //  {
+    //  printf("--orig hist---history at index %d,# %s,%s,%d,%s,%s\n",i,newhist.accountID,newhist.transactionType[i],newhist.amount[i],newhist.targetAccountID[i],newhist.status[i]);
+    //  }
     strcpy(newhist.accountID, transaction.accountID);
     strcpy(newhist.transactionType[transaction.history_length],transaction.transactionType);
     //printf("HISSSSSSSSSSSSSSSSSSSSSSSSSSSSTRY :trans type:%s\n",newhist.transactionType[transaction.history_length]);
@@ -174,27 +187,27 @@ History history(Transaction transaction){
     strcpy(newhist.status[transaction.history_length],transaction.status);
     newhist.history_length= transaction.history_length+1;
     //printf("history length returned %d,history length in %d\n",newhist.history_length,transaction.history_length);
-    for(int i=0;i<newhist.history_length;i++)
-    {
-    printf("---added to hist--history at index %d,# %s,%s,%d,%s,%s\n",i,newhist.accountID,newhist.transactionType[i],newhist.amount[i],newhist.targetAccountID[i],newhist.status[i]);
-    }
+    // for(int i=0;i<newhist.history_length;i++)
+    // {
+    // printf("---added to hist--history at index %d,# %s,%s,%d,%s,%s\n",i,newhist.accountID,newhist.transactionType[i],newhist.amount[i],newhist.targetAccountID[i],newhist.status[i]);
+    // }
     return newhist;
 }
 
 void createAccount(Transaction transaction) {
-    printf("STARTED CREAT ACCOUNT\n");
+    //printf("STARTED CREAT ACCOUNT\n");    //debug
     Transaction temp = readProcess(transaction);
-        printf("382131plz:%d  history index:%d, account#%s, amount%d, condtion %s\n",temp.history_length,0,temp.history.accountID,temp.history.amount[0],temp.history.status[0]);
-        printf("past CREAT ACCOUNT read\n");
+        //printf("382131plz:%d  history index:%d, account#%s, amount%d, condtion %s\n",temp.history_length,0,temp.history.accountID,temp.history.amount[0],temp.history.status[0]);
+        //printf("past CREAT ACCOUNT read\n");
     transaction.history_length=temp.history_length;
     transaction.history = temp.history;
-     printf("```````````````temp length history:%d\n",temp.history_length);
+    //  printf("```````````````temp length history:%d\n",temp.history_length);  //debug
     if(temp.account != transaction.account) 
     {
     strcpy(transaction.status,"Success");
     transaction.history = history(transaction);
     transaction.history_length = transaction.history.history_length;
-    printf("```````````````length history:%d",transaction.history_length);
+    // printf("```````````````length history:%d",transaction.history_length);   //debug
     writeProcess(transaction); //this is fixed.
     }
     else    //there already exist a account
@@ -266,11 +279,11 @@ void withdraw(Transaction transaction) {//char* accountID, int amount
 }
 
 void transfer(Transaction transaction) {//char* accountID, char* targetAccountID, int amount
-    printf("doing trasfer\n");
+    //printf("doing trasfer\n");
     // First withdraw from source account
     Transaction transaction2;
     strcpy(transaction.transactionType,"Transfer out ->");
-    printf("doing trasfer post check\n");
+    //printf("doing trasfer post check\n");
     while(search_queue(get_acc_numb(transaction.targetAccountID)));
     Transaction temp = transferCheckin(transaction);  //change this for checking if failure?
     transaction.history_length=temp.history_length;
@@ -295,18 +308,18 @@ void transfer(Transaction transaction) {//char* accountID, char* targetAccountID
     }
     transaction2 = transaction;
     strcpy(transaction2.transactionType,"Transfer in <-");
-    printf("doing trasfer half way\n");
+    //printf("doing trasfer half way\n"); // debug
     char tempst[10];
     strcpy(transaction2.accountID,transaction.targetAccountID);
     strcpy(transaction2.targetAccountID,transaction.accountID);
     transaction2.account = get_acc_numb(transaction2.accountID);    //set the index number for use in memory
     transaction2.index = transaction2.account% 71;
-    printf("trasaction `````````````````````````---- index %d\n",transaction2.index);
+    //printf("trasaction `````````````````````````---- index %d\n",transaction2.index); //debug
     Transaction temp2 = readforce(transaction2);
     transaction2.history_length=temp2.history_length;
     transaction2.history = temp2.history;
     transaction2.history_length = transaction2.history.history_length;
-        transaction_tostring(transaction2);
+     //   transaction_tostring(transaction2);   //debug
     if(temp2.account == transaction2.account) 
     {
         strcpy(transaction2.status,"Success");
@@ -318,19 +331,19 @@ void transfer(Transaction transaction) {//char* accountID, char* targetAccountID
     }
     else    //log failre
     {
-        printf("trascation fialure 2 was  %d, and %d",temp2.account,transaction2.account);
+        //printf("trascation fialure 2 was  %d, and %d",temp2.account,transaction2.account);
         strcpy(transaction2.status,"Failure");
         transaction2.history = history(transaction2);
-        printf("trans2 history length %d,trans2 history.historyleth %d\n",transaction2.history_length,transaction2.history.history_length);
+        //printf("trans2 history length %d,trans2 history.historyleth %d\n",transaction2.history_length,transaction2.history.history_length);
         transaction2.history_length = transaction2.history.history_length;
-        printf("```trans2 history length %d,trans2 history.historyleth %d\n",transaction2.history_length,transaction2.history.history_length);
+        //printf("```trans2 history length %d,trans2 history.historyleth %d\n",transaction2.history_length,transaction2.history.history_length);
         // writeProcess(temp); //writing only the history 
         transaction2.amount=0;
     }
     transaction = temp;
     transaction_tostring(transaction);
     transaction_tostring(transaction2);
-    printf("382131plz:%d  history index:%d, account#%s, amount%d, condtion %s\n",transaction2.history_length,transaction2.history.history_length-1,transaction2.history.accountID,transaction2.history.amount[transaction2.history.history_length-1],transaction2.history.status[transaction2.history.history_length-1]);
+    //printf("382131plz:%d  history index:%d, account#%s, amount%d, condtion %s\n",transaction2.history_length,transaction2.history.history_length-1,transaction2.history.accountID,transaction2.history.amount[transaction2.history.history_length-1],transaction2.history.status[transaction2.history.history_length-1]);
     transferrelease(transaction,transaction2);
 
     
