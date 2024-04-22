@@ -388,7 +388,8 @@ void closeAccount(Transaction transaction) {//char* accountID
     {
         //printf("deleted acount %s\n",transaction.accountID);
         strcpy(transaction.status,"Success");
-
+        int var;
+        temp.account = var;
         temp.amount =0;
         strcpy(temp.accountID,"\0");
         strcpy(temp.status,"Closed");
