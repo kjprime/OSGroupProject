@@ -357,11 +357,12 @@ void inquiry(Transaction transaction) {//char* accountID
     Transaction temp = readProcess(transaction);// store 0 account id if failure
     transaction.history_length=temp.history_length;
     transaction.history = temp.history;
-    if(temp.account == transaction.account)     //if the accoutn exits
+    if(temp.account == transaction.account)     //if the accoutn exist
     {
         strcpy(transaction.status,"Success");
         temp.history = history(transaction);
         temp.history_length = temp.history.history_length;
+        temp.history.amount[temp.history.history_length-1] = temp.amount;  // writing the current value to history
         writeProcess(temp); 
     }
     else
